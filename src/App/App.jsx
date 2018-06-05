@@ -28,6 +28,16 @@ export default class App extends Component {
     this.socket.on('changeState', (data, time) => {
       console.log('changeState', data, time);
 
+      // если разница больше 2 сек, то перематываем видео!
+      if (Math.abs(this.state.currentTime - time) > 2) {
+        console.log('SEEK TO !!!');
+        this.setState({
+          currentTime: time
+        });
+
+        this.player.seekTo(time, true);
+      }
+
       if (this.state.stateChange !== data) {
         console.log('changeState !!!');
 
@@ -47,6 +57,8 @@ export default class App extends Component {
           default:
             break;
         }
+      } else {
+        console.log('not changeState =) ok ');
       }
     });
 
@@ -58,7 +70,6 @@ export default class App extends Component {
   }
 
   render() {
-    console.log('render');
     return (
       <div>
         <div id="player-1" />
@@ -73,17 +84,17 @@ export default class App extends Component {
       videoId: 'M7lc1UVf-VE'
     });
 
-    this.player.on('stateChange', (event) => {
-      console.log(event);
+    this.player.on('stateChange', ({ data }) => {
+      console.log(data);
       this.player
         .getCurrentTime()
         .then((time) => {
           console.log('then time', Math.round(time));
 
-          this.socket.emit('youtubeEvent', event.data, Math.round(time));
+          this.socket.emit('youtubeEvent', data, Math.round(time));
 
           this.setState({
-            stateChange: event,
+            stateChange: data,
             currentTime: time
           });
         });
