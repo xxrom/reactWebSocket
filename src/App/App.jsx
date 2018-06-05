@@ -12,7 +12,8 @@ export default class App extends Component {
     this.state = {
       endpoint: 'http://localhost:4001',
       color: 'black',
-      playVideo: false
+      currentTime: 0,
+      stateChange: 1
     };
 
     this.socket = socketIOClient(this.state.endpoint);
@@ -24,18 +25,29 @@ export default class App extends Component {
       });
     });
 
-    this.socket.on('youtubeStart', () => {
-      console.log('youtubeStart');
+    this.socket.on('changeState', (data, time) => {
+      console.log('changeState', data, time);
 
-      this.player
-        .playVideo();
-    });
+      if (this.state.stateChange !== data) {
+        console.log('changeState !!!');
 
-    this.socket.on('youtubePause', () => {
-      console.log('youtubePause');
+        this.setState({
+          stateChange: data
+        });
 
-      this.player
-        .pauseVideo();
+        switch (data) {
+          case 1:
+            this.player.playVideo();
+            break;
+
+          case 2:
+            this.player.pauseVideo();
+            break;
+
+          default:
+            break;
+        }
+      }
     });
 
     this.onClick = this.onClick.bind(this);
@@ -66,8 +78,14 @@ export default class App extends Component {
       this.player
         .getCurrentTime()
         .then((time) => {
-          console.log('then thime', Math.round(time));
+          console.log('then time', Math.round(time));
+
           this.socket.emit('youtubeEvent', event.data, Math.round(time));
+
+          this.setState({
+            stateChange: event,
+            currentTime: time
+          });
         });
     });
   }
