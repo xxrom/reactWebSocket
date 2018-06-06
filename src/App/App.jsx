@@ -26,7 +26,7 @@ export default class App extends Component {
 
     this.socket.on('changeState', (data, time) => {
       console.log('changeState', data, time);
-      const currentTime = parseFloat(time.toString()).toFixed(3);
+      const currentTime = Math.round(time * 1000) / 1000;
 
       // если разница больше 2 сек, то перематываем видео!
       if (Math.abs(this.state.currentTime - currentTime) > 2) {
@@ -81,7 +81,7 @@ export default class App extends Component {
 
   setPlayer() {
     this.player = YouTubePlayer('player-1', {
-      videoId: 'M7lc1UVf-VE'
+      videoId: 'pgaEE27nsQw'
     });
 
     this.player.on('stateChange', ({ data }) => {
@@ -89,7 +89,7 @@ export default class App extends Component {
       this.player
         .getCurrentTime()
         .then((time) => {
-          const roundedTime = parseFloat(time.toString()).toFixed(3);
+          const roundedTime = Math.round(time * 1000) / 1000;
           console.log('then time', roundedTime);
 
           this.socket.emit('youtubeEvent', data, roundedTime);
