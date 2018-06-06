@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import socketIOClient from 'socket.io-client';
-import YouTube from 'react-youtube';
 import YouTubePlayer from 'youtube-player';
 
 export default class App extends Component {
@@ -27,15 +26,16 @@ export default class App extends Component {
 
     this.socket.on('changeState', (data, time) => {
       console.log('changeState', data, time);
+      const currentTime = parseFloat(time.toString()).toFixed(3);
 
       // если разница больше 2 сек, то перематываем видео!
-      if (Math.abs(this.state.currentTime - time) > 2) {
+      if (Math.abs(this.state.currentTime - currentTime) > 2) {
         console.log('SEEK TO !!!');
         this.setState({
-          currentTime: time
+          currentTime
         });
 
-        this.player.seekTo(time, true);
+        this.player.seekTo(currentTime, true);
       }
 
       if (this.state.stateChange !== data) {
@@ -89,13 +89,14 @@ export default class App extends Component {
       this.player
         .getCurrentTime()
         .then((time) => {
-          console.log('then time', Math.round(time));
+          const roundedTime = parseFloat(time.toString()).toFixed(3);
+          console.log('then time', roundedTime);
 
-          this.socket.emit('youtubeEvent', data, Math.round(time));
+          this.socket.emit('youtubeEvent', data, roundedTime);
 
           this.setState({
             stateChange: data,
-            currentTime: time
+            currentTime: roundedTime
           });
         });
     });
