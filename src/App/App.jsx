@@ -1,28 +1,20 @@
 import React, { Component } from 'react';
 import socketIOClient from 'socket.io-client';
 import YouTubePlayer from 'youtube-player';
+import './App.css';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
 
-    this.onClick = this.onClick.bind(this);
-
     this.state = {
       endpoint: 'http://localhost:4001',
-      color: 'black',
       currentTime: 0,
-      stateChange: 1
+      stateChange: 1,
+      videoId: 'pgaEE27nsQw'
     };
 
     this.socket = socketIOClient(this.state.endpoint);
-
-    this.socket.on('toggle color auto', (col) => { // подписываемся на рассылку с бэка
-      console.log('toggle color auto');
-      this.setState({
-        color: col
-      });
-    });
 
     this.socket.on('changeState', (data, time) => {
       console.log('changeState', data, time);
@@ -62,26 +54,29 @@ export default class App extends Component {
       }
     });
 
-    this.onClick = this.onClick.bind(this);
+    this.getVideoInput = this.getVideoInput.bind(this);
+    this.setPlayer = this.setPlayer.bind(this);
+    this.onChangeInput = this.onChangeInput.bind(this);
   }
 
   componentDidMount() {
-    this.setPlayer();
+    this.setPlayer(this.state.videoId);
   }
 
   render() {
     return (
-      <div>
-        <div id="player-1" />
-        <h1 style={{ background: this.state.color }}>Hello App HELLO NIKITA уууууууу</h1>
-        <button onClick={this.onClick}>Click to change color from black to RED!</button>
+      <div className="main">
+        <div className="player">
+          <div id="player-1" />
+          {this.getVideoInput()}
+        </div>
       </div>
     );
   }
 
-  setPlayer() {
+  setPlayer(videoId) {
     this.player = YouTubePlayer('player-1', {
-      videoId: 'pgaEE27nsQw'
+      videoId
     });
 
     this.player.on('stateChange', ({ data }) => {
@@ -102,11 +97,29 @@ export default class App extends Component {
     });
   }
 
-  onClick() {
-    console.log('click');
+  getVideoInput() {
+    return (
+      <div className="input-wrapper">
+        <div
+          className="input-wrapper__title"
+        >Current Video Id
+        </div>
+        <input
+          className="input-wrapper__input"
+          onChange={this.onChangeInput}
+          value={this.state.videoId}
+        />
+      </div>
+    );
+  }
+
+  onChangeInput(event) {
+    console.log(event.target.value);
     this.setState({
-      color: 'white'
+      videoId: event.target.value
     });
-    // this.socket.emit('toggle color auto');
+
+    this.player.loadVideoById(event.target.value);
+    this.player.pauseVideo();
   }
 }

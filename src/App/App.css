@@ -1,0 +1,36 @@
+.main {
+  display: flex;
+  height: 100vh;
+  flex-flow: column;
+  background-color: rgb(240, 240, 240);
+  padding: 1em;
+
+  justify-content: center;
+}
+
+.player {
+  align-self: center;
+  flex: 0.3;
+  padding: 1em;
+  background-color: rgb(250, 250, 250);
+}
+
+#player-1 {
+  flex: 1;
+  min-height: 300px;
+  background-color: white;
+}
+
+.input-wrapper {
+  padding-top: 1em;
+}
+
+.input-wrapper__title {
+  font-family: sans-serif;
+}
+
+.input-wrapper__input {
+  font-size: 1em;
+  margin-top: 1em;
+  max-width: 300px;
+}
